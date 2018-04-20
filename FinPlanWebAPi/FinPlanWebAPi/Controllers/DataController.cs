@@ -1,4 +1,5 @@
 ﻿using FinPlanWebAPi.Models;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -24,6 +25,18 @@ namespace FinPlanWebAPi.Controllers
         }
 
         /// <summary>
+        /// Returns data in Json format for all accounts in a given household.
+        /// </summary>
+        /// <param name="HouseholdId">The primary key for the given household.</param>
+        /// <returns></returns>
+        [Route("AccountsJson")]
+        public async Task<IHttpActionResult> GetJsonAccountsByHouseholdId(int HouseholdId)
+        {
+            var json = JsonConvert.SerializeObject(await db.GetAccountByHouseholdId(HouseholdId));
+            return Ok(json);
+        }
+
+        /// <summary>
         /// Returns all data for a given account.
         /// </summary>
         /// <param name="AccountId">The primary key for the given account.</param>
@@ -32,6 +45,19 @@ namespace FinPlanWebAPi.Controllers
         public async Task<PersonalAccount> GetPersonalAccount(int AccountId)
         {
             return await db.GetAccountDetail(AccountId);
+        }
+
+
+        /// <summary>
+        /// Returns all data for a given account in Json format.
+        /// </summary>
+        /// <param name="AccountId">The primary key for the given account.</param>
+        /// <returns></returns>
+        [Route("AccountDetailJson")]
+        public async Task<IHttpActionResult> GetJsonPersonalAccount(int AccountId)
+        {
+            string json = JsonConvert.SerializeObject(await db.GetAccountDetail(AccountId));
+            return Ok(json);
         }
 
         /// <summary>
@@ -46,6 +72,18 @@ namespace FinPlanWebAPi.Controllers
         }
 
         /// <summary>
+        /// Return all data for a given budget in Json format.
+        /// </summary>
+        /// <param name="BudgetId">The primary key for the given budget.</param>
+        /// <returns></returns>
+        [Route("BudgetDetailJson")]
+        public async Task<IHttpActionResult> GetJsonBudgetDetails(int BudgetId)
+        {
+            string json = JsonConvert.SerializeObject(await db.GetBudgetDetails(BudgetId));
+            return Ok(json);
+        }
+
+        /// <summary>
         /// Return data for all budgets for a given household.
         /// </summary>
         /// <param name="HouseholdId">The primary key for the given household.</param>
@@ -54,6 +92,18 @@ namespace FinPlanWebAPi.Controllers
         public async Task<List<Budget>> GetBudgets(int HouseholdId)
         {
             return await db.GetBudgets(HouseholdId);
+        }
+
+        /// <summary>
+        /// Return data for all budgets for a given household in json format.
+        /// </summary>
+        /// <param name="HouseholdId">The primary key for the given household.</param>
+        /// <returns></returns>
+        [Route("BudgetsJson")]
+        public async Task<IHttpActionResult> GetJsonBudgets(int HouseholdId)
+        {
+            string j = JsonConvert.SerializeObject(await db.GetBudgets(HouseholdId));
+            return Ok(j);
         }
 
         /// <summary>
@@ -76,6 +126,18 @@ namespace FinPlanWebAPi.Controllers
         public async Task<Transaction> GetTransactionDetail(int TransactionId)
         {
             return await db.GetTransactionDetail(TransactionId);
+        }
+
+        /// <summary>
+        /// Return all data for a given transaction in Json format.
+        /// </summary>
+        /// <param name="TransactionId">The primary key for the given transaction.</param>
+        /// <returns></returns>
+        [Route("TransactionJson")]
+        public async Task<IHttpActionResult> GetJsonTransactionDetail(int TransactionId)
+        {
+            var j = JsonConvert.SerializeObject(await db.GetTransactionDetail(TransactionId));
+            return Ok(j);
         }
 
         /// <summary>
