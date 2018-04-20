@@ -12,82 +12,153 @@ namespace FinPlanWebAPi.Controllers
         ApplicationDbContext db = new ApplicationDbContext();
 
         // Get methods
-
+        /// <summary>
+        /// Returns data for all accounts in a given household.
+        /// </summary>
+        /// <param name="HouseholdId">The primary key for the given household.</param>
+        /// <returns></returns>
         [Route("Accounts")]
         public async Task<List<PersonalAccount>> GetAccountByHouseholdId(int HouseholdId)
         {
             return await db.GetAccountByHouseholdId(HouseholdId);
         }
 
+        /// <summary>
+        /// Returns all data for a given account.
+        /// </summary>
+        /// <param name="AccountId">The primary key for the given account.</param>
+        /// <returns></returns>
         [Route("AccountDetail")]
         public async Task<PersonalAccount> GetPersonalAccount(int AccountId)
         {
             return await db.GetAccountDetail(AccountId);
         }
 
+        /// <summary>
+        /// Return all data for a given budget.
+        /// </summary>
+        /// <param name="BudgetId">The primary key for the given budget.</param>
+        /// <returns></returns>
         [Route("BudgetDetail")]
         public async Task<Budget> GetBudgetDetails(int BudgetId)
         {
             return await db.GetBudgetDetails(BudgetId);
         }
 
+        /// <summary>
+        /// Return data for all budgets for a given household.
+        /// </summary>
+        /// <param name="HouseholdId">The primary key for the given household.</param>
+        /// <returns></returns>
         [Route("Budgets")]
         public async Task<List<Budget>> GetBudgets(int HouseholdId)
         {
             return await db.GetBudgets(HouseholdId);
         }
 
+        /// <summary>
+        /// Return data for a given household object.
+        /// </summary>
+        /// <param name="HouseholdId">The primary key for the given household.</param>
+        /// <returns></returns>
         [Route("Household")]
         public async Task<Household> GetHousehold(int HouseholdId)
         {
             return await db.GetHousehold(HouseholdId);
         }
 
+        /// <summary>
+        /// Return all data for a given transaction.
+        /// </summary>
+        /// <param name="TransactionId">The primary key for the given transaction.</param>
+        /// <returns></returns>
         [Route("Transaction")]
         public async Task<Transaction> GetTransactionDetail(int TransactionId)
         {
             return await db.GetTransactionDetail(TransactionId);
         }
 
+        /// <summary>
+        /// Return the sum of all budget items for a given budget.
+        /// </summary>
+        /// <param name="BudgetId">The primary key for the given budget.</param>
+        /// <returns></returns>
         [Route("BudgetBalance")]
-        public async Task<string> GetBudgetBalance(int BudgetId)
+        public async Task<decimal> GetBudgetBalance(int BudgetId)
         {
             return await db.GetBudgetBalance(BudgetId);
         }
 
+        /// <summary>
+        /// Return the sum of all transactions that have taken place for a given account, counting debits as negative and credits as positive.
+        /// </summary>
+        /// <param name="AccountId">The primary key for the given account.</param>
+        /// <returns></returns>
         [Route("AccountBalance")]
-        public async Task<string> GetAccountBalance(int AccountId)
+        public async Task<decimal> GetAccountBalance(int AccountId)
         {
             return await db.GetAccountBalance(AccountId);
         }
 
+        /// <summary>
+        /// Add a new transaction with the properties you have provided.
+        /// </summary>
+        /// <param name="accountId">The primary key for the given account.</param>
+        /// <param name="description">A description of your transaction.</param>
+        /// <param name="amount">Decimal quantity for transaction.</param>
+        /// <param name="trxType">Boolean value specifying credit(false)/debit(true).</param>
+        /// <param name="isVoid">Boolean value specifiying voided(true)/not voided(false).</param>
+        /// <param name="categoryId">Integer corresponding to the data type.</param>
+        /// <param name="userId">String GUID corresponding to user Id.</param>
+        /// <param name="reconciled">Boolean value specifying reconciled(true)/not reconciled (false)</param>
+        /// <param name="recBalance">Decimal value showing the amount recorded as reconciled.</param>
+        /// <param name="isDeleted">Boolean value showing whether the transaction has been soft deleted.</param>
+        /// <returns></returns>
         //Post methods
         [Route("AddTransaction")]
         [AcceptVerbs("GET", "POST")]
-        public int AddTransaction(int accountId, string description, decimal amount, bool trxType, bool isVoid, int categoryId, string userId, bool reconciled, decimal recBalance, bool isDeleted)
+        public async Task<int> AddTransaction(int accountId, string description, decimal amount, bool trxType, bool isVoid, int categoryId, string userId, bool reconciled, decimal recBalance, bool isDeleted)
         {
-            return db.AddTransaction(accountId, description, amount, trxType, isVoid, categoryId, userId, reconciled, recBalance, isDeleted);
+             return await db.AddTransaction(accountId, description, amount, trxType, isVoid, categoryId, userId, reconciled, recBalance, isDeleted);
         }
 
+        /// <summary>
+        /// Create a new budget for a given household using the provided name.
+        /// </summary>
+        /// <param name="name">String value of household name.</param>
+        /// <param name="householdId">The primary key for the given household.</param>
+        /// <returns></returns>
         [Route("AddBudget")]
         [AcceptVerbs("GET", "POST")]
-        public int AddBudget(string name, int householdId)
+        public async Task<int> AddBudget(string name, int householdId)
         {
-            return db.AddBudget(name, householdId);
+            return await db.AddBudget(name, householdId);
         }
 
+        /// <summary>
+        /// Create a new budget item for a given budget, including fields for the budget category and the amount.
+        /// </summary>
+        /// <param name="categoryId">Foreign key for the category that will be entered for the new budget item.</param>
+        /// <param name="budgetId">The primary key for the given budget under which this budget item will live.</param>
+        /// <param name="amount">Decimal value for the budget album, which is considered positive and is an expense.</param>
+        /// <returns></returns>
         [Route("AddBudgetItem")]
         [AcceptVerbs("GET", "POST")]
-        public int AddBudgetItem(int categoryId, int budgetId, decimal amount)
+        public async Task<int> AddBudgetItem(int categoryId, int budgetId, decimal amount)
         {
-            return db.AddBudgetItem(categoryId, budgetId, amount);
+            return await db.AddBudgetItem(categoryId, budgetId, amount);
         }
 
+        /// <summary>
+        /// Create a new household with the given name. 
+        /// </summary>
+        /// <param name="name">Name for the new household.</param>
+        /// <returns></returns>
         [Route("AddHousehold")]
         [AcceptVerbs("GET", "POST")]
-        public int AddHousehold(string name)
+        public async Task<int> AddHousehold(string name)
         {
-            return db.AddHousehold(name);
+            return await db.AddHousehold(name);
         }
     }
 }

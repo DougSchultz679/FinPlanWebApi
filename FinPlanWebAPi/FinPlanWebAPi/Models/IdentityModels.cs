@@ -38,7 +38,7 @@ namespace FinPlanWebAPi.Models
 
         public async Task<List<PersonalAccount>> GetAccountByHouseholdId(int hhId)
         {
-            return await Database.SqlQuery<PersonalAccount>("GetAllYears @hhId",
+            return await Database.SqlQuery<PersonalAccount>("GetAccountByHouseholdId @hhId",
                 new SqlParameter("hhId", hhId)).ToListAsync();
         }
 
@@ -50,7 +50,7 @@ namespace FinPlanWebAPi.Models
 
         public async Task<Budget> GetBudgetDetails(int bgtId)
         {
-            return await Database.SqlQuery<Budget>("GetBudgetDetails @bdtId",
+            return await Database.SqlQuery<Budget>("GetBudgetDetails @bgtId",
                 new SqlParameter("bgtId", bgtId)).FirstOrDefaultAsync();
         }
 
@@ -72,43 +72,43 @@ namespace FinPlanWebAPi.Models
                 new SqlParameter("trId", trId)).FirstOrDefaultAsync();
         }
 
-        public async Task<string> GetBudgetBalance(int bgtId)
+        public async Task<decimal> GetBudgetBalance(int bgtId)
         {
-            return await Database.SqlQuery<string>("GetBudgetBalance @bgtId",
+            return await Database.SqlQuery<decimal>("GetBudgetBalance @bgtId",
                 new SqlParameter("bgtId", bgtId)).FirstOrDefaultAsync();
         }
 
-        public async Task<string> GetAccountBalance(int AccountId)
+        public async Task<decimal> GetAccountBalance(int AccountId)
         {
-            return await Database.SqlQuery<string>("GetAccountBalance @AccountId",
+            return await Database.SqlQuery<decimal>("GetAccountBalance @AccountId",
                 new SqlParameter("AccountId", AccountId)).FirstOrDefaultAsync();
         }
 
         // SQL CREATE tasks
-        public int AddBudget(string name, int hhId)
+        public async Task<int> AddBudget(string name, int hhId)
         {
-            return Database.ExecuteSqlCommand("AddBudget @name @hhId",
+            return await Database.ExecuteSqlCommandAsync("AddBudget @name, @hhId",
                 new SqlParameter("name", name),
                 new SqlParameter("hhId", hhId));
         }
 
-        public int AddBudgetItem(int catId, int bdtId, decimal amnt)
+        public async Task<int> AddBudgetItem(int catId, int bgtId, decimal amnt)
         {
-            return Database.ExecuteSqlCommand("AddBudgetItme @catId @bdtId @amnt",
+            return await Database.ExecuteSqlCommandAsync("AddBudgetItem @catId, @bgtId, @amnt",
                 new SqlParameter("catId", catId),
-                new SqlParameter("bdtId", bdtId),
+                new SqlParameter("bgtId", bgtId),
                 new SqlParameter("amnt", amnt));
         }
 
-        public int AddHousehold(string name)
+        public async Task<int> AddHousehold(string name)
         {
-            return Database.ExecuteSqlCommand("AddHousehold @name",
+            return await Database.ExecuteSqlCommandAsync("AddHousehold @name",
                 new SqlParameter("name", name));
         }
 
-        public int AddTransaction(int accId, string desc, decimal amt, bool typ, bool isVoid, int catId, string entById, bool recond, decimal recondAmt, bool isDel)
+        public async Task<int> AddTransaction(int accId, string desc, decimal amt, bool typ, bool isVoid, int catId, string entById, bool recond, decimal recondAmt, bool isDel)
         {
-            return Database.ExecuteSqlCommand("AddTransaction @accId @desc @crAt @amt @typ @isVoid @catId @entById, @recond, @recondAmt, @isDel",
+            return await Database.ExecuteSqlCommandAsync("AddTransaction @accId, @desc, @crAt, @amt, @typ, @isVoid, @catId, @entById, @recond, @recondAmt, @isDel",
                 new SqlParameter("accId", accId),
                 new SqlParameter("desc", desc),
                 new SqlParameter("crAt", DateTimeOffset.Now),
