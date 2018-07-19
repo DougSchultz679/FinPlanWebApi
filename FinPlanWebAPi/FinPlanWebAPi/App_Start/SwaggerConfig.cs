@@ -101,7 +101,7 @@ namespace FinPlanWebAPi
                         // those comments into the generated docs and UI. You can enable this by providing the path to one or
                         // more Xml comment files.
                         //
-                        c.IncludeXmlComments(string.Format(@"{0}\bin\SwaggerDemoApi.XML",
+                        c.IncludeXmlComments(string.Format(@"{0}\bin\FinPlanWebAPi.XML",
                             System.AppDomain.CurrentDomain.BaseDirectory));
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types

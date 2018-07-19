@@ -1,6 +1,9 @@
 ﻿using FinPlanWebAPi.Models;
+using FinPlanWebAPi.Services;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using static FinPlanWebAPi.Models.DataModels;
@@ -10,18 +13,17 @@ namespace FinPlanWebAPi.Controllers
     [RoutePrefix("api/$Planner")]
     public class DataController : ApiController
     {
-        ApplicationDbContext db = new ApplicationDbContext();
+        private readonly IAccountService _accService;
+        private readonly IBudgetService _budgetService;
+        private readonly IHouseholdService _hhService;
 
-        // Get methods
-        /// <summary>
-        /// Returns data for all accounts in a given household.
-        /// </summary>
-        /// <param name="HouseholdId">The primary key for the given household.</param>
-        /// <returns></returns>
-        [Route("Accounts")]
-        public async Task<List<PersonalAccount>> GetAccountByHouseholdId(int HouseholdId)
+
+        //DI in action!
+        public DataController(IAccountService AccService, IBudgetService BudgetService, IHouseholdService HouseholdService)
         {
-            return await db.GetAccountByHouseholdId(HouseholdId);
+            _accService = AccService ?? throw new ArgumentNullException(nameof(AccService));
+            _budgetService = BudgetService ?? throw new ArgumentNullException(nameof(BudgetService));
+            _hhService = HouseholdService ?? throw new ArgumentNullException(nameof(HouseholdService));
         }
 
         /// <summary>
@@ -29,22 +31,18 @@ namespace FinPlanWebAPi.Controllers
         /// </summary>
         /// <param name="HouseholdId">The primary key for the given household.</param>
         /// <returns></returns>
-        [Route("AccountsJson")]
-        public async Task<IHttpActionResult> GetJsonAccountsByHouseholdId(int HouseholdId)
+        [HttpGet]
+        [Route("Accounts")]
+        public async Task<IHttpActionResult> GetHouseholdAccounts(int HouseholdId)
         {
-            var json = JsonConvert.SerializeObject(await db.GetAccountByHouseholdId(HouseholdId));
-            return Ok(json);
-        }
-
-        /// <summary>
-        /// Returns all data for a given account.
-        /// </summary>
-        /// <param name="AccountId">The primary key for the given account.</param>
-        /// <returns></returns>
-        [Route("AccountDetail")]
-        public async Task<PersonalAccount> GetPersonalAccount(int AccountId)
-        {
-            return await db.GetAccountDetail(AccountId);
+            try
+            {
+                return Ok(await _accService.GetHouseholdAccounts(HouseholdId));
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
 
@@ -53,22 +51,17 @@ namespace FinPlanWebAPi.Controllers
         /// </summary>
         /// <param name="AccountId">The primary key for the given account.</param>
         /// <returns></returns>
-        [Route("AccountDetailJson")]
-        public async Task<IHttpActionResult> GetJsonPersonalAccount(int AccountId)
+        [Route("AccountDetail")]
+        public async Task<IHttpActionResult> GetPersonalAccount(int AccountId)
         {
-            string json = JsonConvert.SerializeObject(await db.GetAccountDetail(AccountId));
-            return Ok(json);
-        }
-
-        /// <summary>
-        /// Return all data for a given budget.
-        /// </summary>
-        /// <param name="BudgetId">The primary key for the given budget.</param>
-        /// <returns></returns>
-        [Route("BudgetDetail")]
-        public async Task<Budget> GetBudgetDetails(int BudgetId)
-        {
-            return await db.GetBudgetDetails(BudgetId);
+            try
+            {
+                return Ok(await _accService.GetPersonalAccount(AccountId));
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -76,22 +69,19 @@ namespace FinPlanWebAPi.Controllers
         /// </summary>
         /// <param name="BudgetId">The primary key for the given budget.</param>
         /// <returns></returns>
-        [Route("BudgetDetailJson")]
-        public async Task<IHttpActionResult> GetJsonBudgetDetails(int BudgetId)
+        [HttpGet]
+        [Route("Budget")]
+        public async Task<IHttpActionResult> GetBudget(int BudgetId)
         {
-            string json = JsonConvert.SerializeObject(await db.GetBudgetDetails(BudgetId));
-            return Ok(json);
-        }
+            try
+            {
+                return Ok(await _budgetService.GetBudgetDetails(BudgetId));
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
 
-        /// <summary>
-        /// Return data for all budgets for a given household.
-        /// </summary>
-        /// <param name="HouseholdId">The primary key for the given household.</param>
-        /// <returns></returns>
-        [Route("Budgets")]
-        public async Task<List<Budget>> GetBudgets(int HouseholdId)
-        {
-            return await db.GetBudgets(HouseholdId);
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -99,45 +89,41 @@ namespace FinPlanWebAPi.Controllers
         /// </summary>
         /// <param name="HouseholdId">The primary key for the given household.</param>
         /// <returns></returns>
-        [Route("BudgetsJson")]
-        public async Task<IHttpActionResult> GetJsonBudgets(int HouseholdId)
+        [HttpGet]
+        [Route("Budgets")]
+        public async Task<IHttpActionResult> GetBudgets(int HouseholdId)
         {
-            string j = JsonConvert.SerializeObject(await db.GetBudgets(HouseholdId));
-            return Ok(j);
+            try
+            {
+                return Ok(await _budgetService.GetBudgets(HouseholdId));
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
-        /// <summary>
-        /// Return data for a given household object.
-        /// </summary>
-        /// <param name="HouseholdId">The primary key for the given household.</param>
-        /// <returns></returns>
-        [Route("Household")]
-        public async Task<Household> GetHousehold(int HouseholdId)
-        {
-            return await db.GetHousehold(HouseholdId);
-        }
-
-        /// <summary>
-        /// Return all data for a given transaction.
-        /// </summary>
-        /// <param name="TransactionId">The primary key for the given transaction.</param>
-        /// <returns></returns>
-        [Route("Transaction")]
-        public async Task<Transaction> GetTransactionDetail(int TransactionId)
-        {
-            return await db.GetTransactionDetail(TransactionId);
-        }
 
         /// <summary>
         /// Return all data for a given transaction in Json format.
         /// </summary>
         /// <param name="TransactionId">The primary key for the given transaction.</param>
         /// <returns></returns>
-        [Route("TransactionJson")]
+        [HttpGet]
+        [Route("Transaction")]
         public async Task<IHttpActionResult> GetJsonTransactionDetail(int TransactionId)
         {
-            var j = JsonConvert.SerializeObject(await db.GetTransactionDetail(TransactionId));
-            return Ok(j);
+            try
+            {
+                return Ok(await _accService.GetTransaction(TransactionId));
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+
         }
 
         /// <summary>
@@ -145,10 +131,19 @@ namespace FinPlanWebAPi.Controllers
         /// </summary>
         /// <param name="BudgetId">The primary key for the given budget.</param>
         /// <returns></returns>
+        [HttpGet]
         [Route("BudgetBalance")]
-        public async Task<decimal> GetBudgetBalance(int BudgetId)
+        public async Task<IHttpActionResult> GetBudgetBalance(int BudgetId)
         {
-            return await db.GetBudgetBalance(BudgetId);
+            try
+            {
+                return Ok(await _budgetService.GetBudgetBalance(BudgetId));
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -156,10 +151,20 @@ namespace FinPlanWebAPi.Controllers
         /// </summary>
         /// <param name="AccountId">The primary key for the given account.</param>
         /// <returns></returns>
+        [HttpGet]
         [Route("AccountBalance")]
-        public async Task<decimal> GetAccountBalance(int AccountId)
+        public async Task<IHttpActionResult> GetAccountBalance(int AccountId)
         {
-            return await db.GetAccountBalance(AccountId);
+            try
+            {
+                return Ok(await _accService.GetAccountBalance(AccountId));
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
+
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -177,11 +182,17 @@ namespace FinPlanWebAPi.Controllers
         /// <param name="isDeleted">Boolean value showing whether the transaction has been soft deleted.</param>
         /// <returns></returns>
         //Post methods
-        [Route("AddTransaction")]
-        [AcceptVerbs("GET", "POST")]
-        public async Task<int> AddTransaction(int accountId, string description, decimal amount, bool trxType, bool isVoid, int categoryId, string userId, bool reconciled, decimal recBalance, bool isDeleted)
+        [Route("Transaction")]
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> AddTransaction(int accountId, string description, decimal amount, bool trxType, bool isVoid, int categoryId, string userId, bool reconciled, decimal recBalance, bool isDeleted)
         {
-             return await db.AddTransaction(accountId, description, amount, trxType, isVoid, categoryId, userId, reconciled, recBalance, isDeleted);
+            try
+            {
+                return Ok(await _accService.AddTransaction(accountId, description, amount, trxType, categoryId, userId, isVoid, recBalance, reconciled, isDeleted));
+            } catch (Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -190,11 +201,18 @@ namespace FinPlanWebAPi.Controllers
         /// <param name="name">String value of household name.</param>
         /// <param name="householdId">The primary key for the given household.</param>
         /// <returns></returns>
-        [Route("AddBudget")]
-        [AcceptVerbs("GET", "POST")]
-        public async Task<int> AddBudget(string name, int householdId)
+        [Route("Budget")]
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> AddBudget(string name, int householdId)
         {
-            return await db.AddBudget(name, householdId);
+            try
+            {
+                return Ok(await _budgetService.AddBudget(name, householdId));
+            } catch (Exception ex)
+            {
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -204,11 +222,38 @@ namespace FinPlanWebAPi.Controllers
         /// <param name="budgetId">The primary key for the given budget under which this budget item will live.</param>
         /// <param name="amount">Decimal value for the budget album, which is considered positive and is an expense.</param>
         /// <returns></returns>
-        [Route("AddBudgetItem")]
-        [AcceptVerbs("GET", "POST")]
-        public async Task<int> AddBudgetItem(int categoryId, int budgetId, decimal amount)
+        [Route("BudgetItem")]
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> AddBudgetItem(int categoryId, int budgetId, decimal amount)
         {
-            return await db.AddBudgetItem(categoryId, budgetId, amount);
+            try
+            {
+                return Ok(await _budgetService.AddBudgetItem(categoryId, budgetId, amount));
+
+            } catch (Exception ex)
+            {
+                //ToDo: log exception
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Return data for a given household object.
+        /// </summary>
+        /// <param name="HouseholdId">The primary key for the given household.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Household")]
+        public async Task<IHttpActionResult> GetHousehold(int HouseholdId)
+        {
+            try
+            {
+                return Ok(await _hhService.GetHousehold(HouseholdId));
+            } catch (Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -216,11 +261,17 @@ namespace FinPlanWebAPi.Controllers
         /// </summary>
         /// <param name="name">Name for the new household.</param>
         /// <returns></returns>
-        [Route("AddHousehold")]
-        [AcceptVerbs("GET", "POST")]
-        public async Task<int> AddHousehold(string name)
+        [Route("Household")]
+        [AcceptVerbs("POST")]
+        public async Task<IHttpActionResult> AddHousehold(string name)
         {
-            return await db.AddHousehold(name);
+            try
+            {
+                return Ok(_hhService.AddHousehold(name));
+            } catch (Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
     }
 }
