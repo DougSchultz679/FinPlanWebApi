@@ -17,13 +17,31 @@ namespace FinPlanWebAPi.Controllers
         private readonly IBudgetService _budgetService;
         private readonly IHouseholdService _hhService;
 
-
         //DI in action!
         public DataController(IAccountService AccService, IBudgetService BudgetService, IHouseholdService HouseholdService)
         {
             _accService = AccService ?? throw new ArgumentNullException(nameof(AccService));
             _budgetService = BudgetService ?? throw new ArgumentNullException(nameof(BudgetService));
             _hhService = HouseholdService ?? throw new ArgumentNullException(nameof(HouseholdService));
+        }
+
+        /// <summary>
+        /// Returns all data for a given account in Json format.
+        /// </summary>
+        /// <param name="AccountId">The primary key for the given account.</param>
+        /// <returns></returns>
+        [Route("Account")]
+        public async Task<IHttpActionResult> GetPersonalAccount(int AccountId)
+        {
+            try
+            {
+                return Ok(await _accService.GetPersonalAccount(AccountId));
+            } 
+            catch (Exception ex)
+            {
+                //ToDo: log exception
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -38,110 +56,10 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _accService.GetHouseholdAccounts(HouseholdId));
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 //ToDo: log exception
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-        }
-
-
-        /// <summary>
-        /// Returns all data for a given account in Json format.
-        /// </summary>
-        /// <param name="AccountId">The primary key for the given account.</param>
-        /// <returns></returns>
-        [Route("AccountDetail")]
-        public async Task<IHttpActionResult> GetPersonalAccount(int AccountId)
-        {
-            try
-            {
-                return Ok(await _accService.GetPersonalAccount(AccountId));
-            } catch (Exception ex)
-            {
-                //ToDo: log exception
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <summary>
-        /// Return all data for a given budget in Json format.
-        /// </summary>
-        /// <param name="BudgetId">The primary key for the given budget.</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("Budget")]
-        public async Task<IHttpActionResult> GetBudget(int BudgetId)
-        {
-            try
-            {
-                return Ok(await _budgetService.GetBudgetDetails(BudgetId));
-            } catch (Exception ex)
-            {
-                //ToDo: log exception
-
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <summary>
-        /// Return data for all budgets for a given household in json format.
-        /// </summary>
-        /// <param name="HouseholdId">The primary key for the given household.</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("Budgets")]
-        public async Task<IHttpActionResult> GetBudgets(int HouseholdId)
-        {
-            try
-            {
-                return Ok(await _budgetService.GetBudgets(HouseholdId));
-            } catch (Exception ex)
-            {
-                //ToDo: log exception
-
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-        }
-
-
-        /// <summary>
-        /// Return all data for a given transaction in Json format.
-        /// </summary>
-        /// <param name="TransactionId">The primary key for the given transaction.</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("Transaction")]
-        public async Task<IHttpActionResult> GetJsonTransactionDetail(int TransactionId)
-        {
-            try
-            {
-                return Ok(await _accService.GetTransaction(TransactionId));
-            } catch (Exception ex)
-            {
-                //ToDo: log exception
-
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-
-        }
-
-        /// <summary>
-        /// Return the sum of all budget items for a given budget.
-        /// </summary>
-        /// <param name="BudgetId">The primary key for the given budget.</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("BudgetBalance")]
-        public async Task<IHttpActionResult> GetBudgetBalance(int BudgetId)
-        {
-            try
-            {
-                return Ok(await _budgetService.GetBudgetBalance(BudgetId));
-            } catch (Exception ex)
-            {
-                //ToDo: log exception
-
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
@@ -162,6 +80,26 @@ namespace FinPlanWebAPi.Controllers
             {
                 //ToDo: log exception
 
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Return all data for a given transaction in Json format.
+        /// </summary>
+        /// <param name="TransactionId">The primary key for the given transaction.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Transaction")]
+        public async Task<IHttpActionResult> GetTransactionDetail(int TransactionId)
+        {
+            try
+            {
+                return Ok(await _accService.GetTransaction(TransactionId));
+            } 
+            catch (Exception ex)
+            {
+                //ToDo: log exception
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -189,8 +127,29 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _accService.AddTransaction(accountId, description, amount, trxType, categoryId, userId, isVoid, recBalance, reconciled, isDeleted));
+            } 
+            catch (Exception ex)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Return all data for a given budget in Json format.
+        /// </summary>
+        /// <param name="BudgetId">The primary key for the given budget.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Budget")]
+        public async Task<IHttpActionResult> GetBudget(int BudgetId)
+        {
+            try
+            {
+                return Ok(await _budgetService.GetBudgetDetails(BudgetId));
             } catch (Exception ex)
             {
+                //ToDo: log exception
+
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
@@ -208,8 +167,30 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _budgetService.AddBudget(name, householdId));
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Return data for all budgets for a given household in json format.
+        /// </summary>
+        /// <param name="HouseholdId">The primary key for the given household.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Budgets")]
+        public async Task<IHttpActionResult> GetBudgets(int HouseholdId)
+        {
+            try
+            {
+                return Ok(await _budgetService.GetBudgets(HouseholdId));
+            } 
+            catch (Exception ex)
+            {
+                //ToDo: log exception
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -230,7 +211,29 @@ namespace FinPlanWebAPi.Controllers
             {
                 return Ok(await _budgetService.AddBudgetItem(categoryId, budgetId, amount));
 
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
+            {
+                //ToDo: log exception
+
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Return the sum of all budget items for a given budget.
+        /// </summary>
+        /// <param name="BudgetId">The primary key for the given budget.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("BudgetBalance")]
+        public async Task<IHttpActionResult> GetBudgetBalance(int BudgetId)
+        {
+            try
+            {
+                return Ok(await _budgetService.GetBudgetBalance(BudgetId));
+            } 
+            catch (Exception ex)
             {
                 //ToDo: log exception
 
@@ -250,7 +253,8 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _hhService.GetHousehold(HouseholdId));
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -268,7 +272,8 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(_hhService.AddHousehold(name));
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
