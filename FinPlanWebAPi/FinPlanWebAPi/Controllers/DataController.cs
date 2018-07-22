@@ -17,14 +17,16 @@ namespace FinPlanWebAPi.Controllers
         private readonly IBudgetService _budgetService;
         private readonly IHouseholdService _hhService;
         private readonly ISecurityService _securityService;
+        private readonly ILoggingService _logService;
 
-        //DI in action!
-        public DataController(IAccountService AccService, IBudgetService BudgetService, IHouseholdService HouseholdService, ISecurityService SecurityService)
+        //DI in action
+        public DataController(IAccountService AccService, IBudgetService BudgetService, IHouseholdService HouseholdService, ISecurityService SecurityService, ILoggingService LoggingService)
         {
             _accService = AccService ?? throw new ArgumentNullException(nameof(AccService));
             _budgetService = BudgetService ?? throw new ArgumentNullException(nameof(BudgetService));
             _hhService = HouseholdService ?? throw new ArgumentNullException(nameof(HouseholdService));
             _securityService = SecurityService ?? throw new ArgumentNullException(nameof(SecurityService));
+            _logService = LoggingService ?? throw new ArgumentNullException(nameof(LoggingService));
         }
 
         /// <summary>
@@ -38,11 +40,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _accService.GetPersonalAccount(AccountId));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                //ToDo: log exception
-
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -60,12 +60,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _accService.GetHouseholdAccounts(HouseholdId));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                //ToDo: log exception
-
-
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -85,8 +82,7 @@ namespace FinPlanWebAPi.Controllers
                 return Ok(await _accService.GetAccountBalance(AccountId));
             } catch (Exception ex)
             {
-                //ToDo: log exception
-
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -105,11 +101,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _accService.GetTransaction(TransactionId));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                //ToDo: log exception
-
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -138,10 +132,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _accService.AddTransaction(accountId, description, amount, trxType, categoryId, userId, isVoid, recBalance, reconciled, isDeleted));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -162,7 +155,7 @@ namespace FinPlanWebAPi.Controllers
                 return Ok(await _budgetService.GetBudgetDetails(BudgetId));
             } catch (Exception ex)
             {
-                //ToDo: log exception
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -182,9 +175,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _budgetService.AddBudget(name, householdId));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -203,10 +196,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _budgetService.GetBudgets(HouseholdId));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                //ToDo: log exception
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -228,10 +220,9 @@ namespace FinPlanWebAPi.Controllers
             {
                 return Ok(await _budgetService.AddBudgetItem(categoryId, budgetId, amount));
 
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                //ToDo: log exception
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -250,10 +241,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _budgetService.GetBudgetBalance(BudgetId));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
-                //ToDo: log exception
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -272,9 +262,9 @@ namespace FinPlanWebAPi.Controllers
             try
             {
                 return Ok(await _hhService.GetHousehold(HouseholdId));
-            } 
-            catch (Exception ex)
+            } catch (Exception ex)
             {
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
@@ -292,11 +282,10 @@ namespace FinPlanWebAPi.Controllers
         {
             try
             {
-                return Ok(_hhService.AddHousehold(name));
-            } 
-            catch (Exception ex)
+                return Ok(await _hhService.AddHousehold(name));
+            } catch (Exception ex)
             {
-
+                _logService.AddErrorWinEventLog(ex);
                 _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
