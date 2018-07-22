@@ -16,13 +16,15 @@ namespace FinPlanWebAPi.Controllers
         private readonly IAccountService _accService;
         private readonly IBudgetService _budgetService;
         private readonly IHouseholdService _hhService;
+        private readonly ISecurityService _securityService;
 
         //DI in action!
-        public DataController(IAccountService AccService, IBudgetService BudgetService, IHouseholdService HouseholdService)
+        public DataController(IAccountService AccService, IBudgetService BudgetService, IHouseholdService HouseholdService, ISecurityService SecurityService)
         {
             _accService = AccService ?? throw new ArgumentNullException(nameof(AccService));
             _budgetService = BudgetService ?? throw new ArgumentNullException(nameof(BudgetService));
             _hhService = HouseholdService ?? throw new ArgumentNullException(nameof(HouseholdService));
+            _securityService = SecurityService ?? throw new ArgumentNullException(nameof(SecurityService));
         }
 
         /// <summary>
@@ -40,6 +42,8 @@ namespace FinPlanWebAPi.Controllers
             catch (Exception ex)
             {
                 //ToDo: log exception
+
+                _securityService.HideErrorTime();
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
@@ -60,6 +64,9 @@ namespace FinPlanWebAPi.Controllers
             catch (Exception ex)
             {
                 //ToDo: log exception
+
+
+                _securityService.HideErrorTime();
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
@@ -79,6 +86,8 @@ namespace FinPlanWebAPi.Controllers
             } catch (Exception ex)
             {
                 //ToDo: log exception
+
+                _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -100,6 +109,8 @@ namespace FinPlanWebAPi.Controllers
             catch (Exception ex)
             {
                 //ToDo: log exception
+
+                _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -130,6 +141,9 @@ namespace FinPlanWebAPi.Controllers
             } 
             catch (Exception ex)
             {
+
+                _securityService.HideErrorTime();
+
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
@@ -149,6 +163,7 @@ namespace FinPlanWebAPi.Controllers
             } catch (Exception ex)
             {
                 //ToDo: log exception
+                _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -170,6 +185,7 @@ namespace FinPlanWebAPi.Controllers
             } 
             catch (Exception ex)
             {
+                _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -191,6 +207,7 @@ namespace FinPlanWebAPi.Controllers
             catch (Exception ex)
             {
                 //ToDo: log exception
+                _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -215,6 +232,7 @@ namespace FinPlanWebAPi.Controllers
             catch (Exception ex)
             {
                 //ToDo: log exception
+                _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -236,6 +254,7 @@ namespace FinPlanWebAPi.Controllers
             catch (Exception ex)
             {
                 //ToDo: log exception
+                _securityService.HideErrorTime();
 
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
@@ -256,6 +275,8 @@ namespace FinPlanWebAPi.Controllers
             } 
             catch (Exception ex)
             {
+                _securityService.HideErrorTime();
+
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
@@ -275,6 +296,9 @@ namespace FinPlanWebAPi.Controllers
             } 
             catch (Exception ex)
             {
+
+                _securityService.HideErrorTime();
+
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
