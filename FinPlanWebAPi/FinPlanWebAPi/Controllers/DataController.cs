@@ -1,12 +1,9 @@
-﻿using FinPlanWebAPi.Models;
-using FinPlanWebAPi.Services;
-using Newtonsoft.Json;
+﻿using FinPlanWebAPi.Services;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
-using static FinPlanWebAPi.Models.DataModels;
 
 namespace FinPlanWebAPi.Controllers
 {
@@ -282,7 +279,7 @@ namespace FinPlanWebAPi.Controllers
         {
             try
             {
-                return Ok(await _hhService.AddHousehold(name));
+                return Ok(await _hhService.CreateHousehold(name));
             } catch (Exception ex)
             {
                 _logService.AddErrorWinEventLog(ex);

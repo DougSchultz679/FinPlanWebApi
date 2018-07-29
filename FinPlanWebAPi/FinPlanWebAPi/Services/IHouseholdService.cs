@@ -9,6 +9,6 @@ namespace FinPlanWebAPi.Services
     public interface IHouseholdService
     {
         threading.Task<string> GetHousehold(int HouseholdId);
-        threading.Task<int> AddHousehold(string name);
+        threading.Task<int> CreateHousehold(string name);
     }
 }

@@ -8,7 +8,7 @@ using System.Web;
 
 namespace FinPlanWebAPi.Services
 {
-    public class HouseholdService
+    public class HouseholdService : IHouseholdService
     {
         private readonly ApplicationDbContext _dbContext;
 
